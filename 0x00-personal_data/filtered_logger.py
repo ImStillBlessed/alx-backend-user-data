@@ -4,8 +4,11 @@ This module contains a method that returns the log message obfuscated
 """
 import re
 import logging
+import os
+from mysql import connector
 
-PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'last_login')
+
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -46,9 +49,40 @@ def get_logger() -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.propagate = False
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(
-        RedactingFormatter(list((
-            "name", "email", "phone", "ssn", "password"))))
+    stream_handler.setFormatter(RedactingFormatter(list(PII_FIELDS)))
     logger.addHandler(stream_handler)
 
     return logger
+
+
+def get_db() -> connector.connection.MySQLConnection:
+    """
+    connect to a secure holberton database to read a users table.
+    """
+    return connector.connect(
+        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
+        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
+        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
+        database=os.getenv('PERSONAL_DATA_DB_NAME')
+    )
+
+
+def main():
+    """
+    Main function to fetch and log user data
+    """
+    logger = get_logger()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM users')
+    rows = cursor.fetchall()
+    columns = [description[0] for description in cursor.description]
+
+    for row in rows:
+        user_data = "; ".join([f"{col}={value}" for col,
+                               value in zip(columns, row)])
+        logger.info(user_data)
+
+
+if __name__ == "__main__":
+    main()
