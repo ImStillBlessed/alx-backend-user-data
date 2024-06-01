@@ -3,6 +3,7 @@
 This module contains a method that returns the log message obfuscated
 """
 import re
+from typing import List
 import logging
 import os
 from mysql import connector
@@ -31,7 +32,7 @@ class RedactingFormatter(logging.Formatter):
                             original_message, self.SEPARATOR)
 
 
-def filter_datum(fields: list, redaction: str, message: str,
+def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     """
     Returns the log message obfuscated
