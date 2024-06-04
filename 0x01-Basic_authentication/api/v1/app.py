@@ -18,11 +18,16 @@ auth_type = os.environ.get('AUTH_TYPE')
 if auth_type:
     auth = Auth()
 
-error_paths = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
+error_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
+               '/api/v1/forbidden/']
 
 
 @app.before_request
 def before_request():
+    """
+    handles the auth info before the requst is
+    put hrough
+    """
     if auth is not None and auth.require_auth(request.path, error_paths):
         if auth.authorization_header(request) is None:
             abort(401)
