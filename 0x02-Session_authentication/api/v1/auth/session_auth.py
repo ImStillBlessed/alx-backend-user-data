@@ -18,6 +18,7 @@ class SessionAuth(Auth):
         Creates a session ID for the user_id in routing
         """
         if type(user_id) == str:
-            session_id = uuid.uuid4()
+            session_id = str(uuid.uuid4())
+            print(session_id)
             self.user_id_by_session_id[session_id] = user_id
-        return session_id
+            return session_id
