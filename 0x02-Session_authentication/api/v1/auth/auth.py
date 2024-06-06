@@ -3,6 +3,7 @@
 Authentication module for the app
 """
 from flask import request
+import os
 import fnmatch
 from typing import List, TypeVar
 
@@ -34,3 +35,12 @@ class Auth:
         """ Method that handles current user
         """
         return None
+    
+    def session_cookie(self, request=None):
+        """
+        Returns: a cookie value from a request
+        """
+        if request == None:
+            return None
+        session_name = os.getenv('SESSION_NAME')
+        return request.cookies.get(session_name) 
