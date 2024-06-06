@@ -5,7 +5,6 @@ This module contains the basic auth class
 from api.v1.auth.auth import Auth
 from typing import TypeVar
 from models.user import User
-import base64
 
 
 class BasicAuth(Auth):
@@ -34,8 +33,7 @@ class BasicAuth(Auth):
                                 base64_authorization_header) is not str:
             return None
         try:
-            return base64.b64decode(
-                base64_authorization_header).decode('utf-8')
+            return base64_authorization_header.encode('utf-8').decode('base64')
         except Exception:
             return None
 
