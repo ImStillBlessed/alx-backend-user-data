@@ -22,3 +22,10 @@ class SessionAuth(Auth):
             print(session_id)
             self.user_id_by_session_id[session_id] = user_id
             return session_id
+
+    def user_id_for_session_id(self, session_id: str = None) -> str:
+        """
+        Returns the User ID based on the session ID
+        """
+        if type(session_id) == str:
+            return self.user_id_by_session_id.get(session_id)
