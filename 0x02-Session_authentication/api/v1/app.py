@@ -25,8 +25,8 @@ if auth_type:
     else:
         auth = Auth()
 
-error_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
-               '/api/v1/forbidden/']
+forbidden_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
+               '/api/v1/forbidden/','/api/v1/auth_session/login/']
 
 
 @app.before_request
@@ -35,8 +35,10 @@ def before_request():
     handles the auth info before the requst is
     put hrough
     """
-    if auth is not None and auth.require_auth(request.path, error_paths):
+    if auth is not None and auth.require_auth(request.path, forbidden_paths):
         if auth.authorization_header(request) is None:
+            abort(401)
+        if auth.session_cookie(request) is None:
             abort(401)
         if auth.current_user(request) is None:
             abort(403)
