@@ -18,11 +18,3 @@ class User(Base):
     hashed_password = Column(String(250), nullable=False)
     session_id = Column(String(250), nullable=True)
     reset_token = Column(String(250), nullable=True)
-
-    def __init__(self, email: str, hashed_password: str) -> None:
-        """Initialize a new User instance
-        """
-        self.email = email
-        self.hashed_password = hashed_password
-        self.session_id = None
-        self.reset_token = None

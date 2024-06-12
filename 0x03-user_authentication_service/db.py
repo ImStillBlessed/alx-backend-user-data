@@ -6,6 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
 
 from user import Base, User
 
@@ -39,3 +41,17 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
+    
+    def find_user_by(self, **kwargs) -> User:
+        """Find a user by a given attribute
+        """
+        session = self._session
+        query = session.query(User)
+        for key, value in kwargs.items():
+            if not hasattr(User, key):
+                raise InvalidRequestError(f"Invalid attribute: {key}")
+            query = query.filter(getattr(User, key) == value)
+        user = query.first()
+        if user is None:
+            raise NoResultFound("No result found for the given filter")
+        return user
