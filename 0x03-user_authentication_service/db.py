@@ -3,12 +3,10 @@
 This module is for DB
 """
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
-
 from user import Base, User
 
 
@@ -45,8 +43,8 @@ class DB:
     def find_user_by(self, **kwargs) -> User:
         """Find a user by a given attribute
         """
-        # session = self._session
-        # query = session.query(User)
+        session = self._session
+        query = session.query(User)
         for key, value in kwargs.items():
             if not hasattr(User, key):
                 raise InvalidRequestError(f"Invalid attribute: {key}")
