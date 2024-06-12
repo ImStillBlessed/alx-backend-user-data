@@ -41,12 +41,12 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
-    
+
     def find_user_by(self, **kwargs) -> User:
         """Find a user by a given attribute
         """
-        session = self._session
-        query = session.query(User)
+        # session = self._session
+        # query = session.query(User)
         for key, value in kwargs.items():
             if not hasattr(User, key):
                 raise InvalidRequestError(f"Invalid attribute: {key}")
@@ -55,3 +55,14 @@ class DB:
         if user is None:
             raise NoResultFound("No result found for the given filter")
         return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """Update a user in the database
+        """
+        user = self.find_user_by(id=user_id)
+        if user:
+            for key, value in kwargs.items():
+                if not hasattr(user, key):
+                    raise ValueError(f"Invalid attribute: {key}")
+                setattr(user, key, value)
+            self._session.commit()
