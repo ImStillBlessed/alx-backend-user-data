@@ -101,3 +101,47 @@ class Auth:
             self._db._session.commit()
         except NoResultFound:
             pass
+
+    def get_reset_password_token(self, email: str) -> str:
+        """
+        Get the reset password token for a user identified by email.
+        Args:
+        - email: str - The user's email.
+        Returns:
+        - str: The reset password token.
+        Raises:
+        - ValueError: If no user is found with the provided email.
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            raise ValueError(f"User with email '{email}' not found")
+
+        reset_token = self._generate_uuid()
+        user.reset_token = reset_token
+        self._db._session.commit()
+        return reset_token
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """
+        Update the user's password based on the reset token.
+
+        Args:
+        - reset_token: str - The reset token received via email.
+        - password: str - The new password to set.
+        Returns:
+        - None
+
+        Raises:
+        - ValueError: If no user is found with the provided reset token.
+        """
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+        except NoResultFound:
+            raise ValueError("Invalid reset token")
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'),
+                                        bcrypt.gensalt()).decode('utf-8')
+        user.hashed_password = hashed_password
+        user.reset_token = None
+        self._db._session.commit()
